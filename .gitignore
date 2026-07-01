@@ -1,0 +1,26 @@
+# caches / compiled
+__pycache__/
+*.pyc
+*.py[cod]
+.DS_Store
+.ipynb_checkpoints/
+_runtime/
+.gradio/
+
+# large binaries (weights / embeddings / data) — host on Hugging Face / Zenodo
+*.pt
+*.npy
+*.pkl
+*.safetensors
+
+# BEAST posterior outputs (large)
+*.trees
+*.tree
+*.log
+*.combined.*
+
+# demo-generated model preview assets
+models/**/*.png
+models/**/*.jpg
+models/**/*.jpeg
+models/**/*.webp

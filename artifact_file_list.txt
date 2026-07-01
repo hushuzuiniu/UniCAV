@@ -1,0 +1,15 @@
+# Minimal artifact file/directory list for the Hugging Face Model repo.
+# Keep the same relative paths in the artifact repo.
+data/virus_antibody_classification_dataset.json
+data/Env_HXB2_feature.csv
+data/ch505_aligned_to_training.fasta
+train_pave.py
+infer_pave.py
+models/
+results/pave/focal_alpha_sweep_hybrid/focal_alpha0p75/20260520-071018_classification_PAVE/
+results/pave/embedding_cache/classification_train_env_seq_ESMC-600M_bf6c195abcce91fce70e.pt
+results/pave/embedding_cache/classification_train_vh_seq_Antiberta2-H_d873654efd8cc9349e5b.pt
+results/pave/embedding_cache/classification_train_vl_seq_Antiberta2-L_d82a9965bf06f3222c07.pt
+results/pave/embedding_cache/classification_train_epitope_token_ESMC-600M_6e76c151a32e9d09e8f3.pt
+model_weight/esmc-600m-2024-12/
+model_weight/antiberta2/

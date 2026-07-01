@@ -1,0 +1,3 @@
+"source","source_file","used_for","n_tips"
+"measured_ensemble","/Users/hushu/Dropbox (个人)/Hu Shu/flu_deeplearning/HIV/github_upload/figures/source_data/independent_test_predictions_ensemble.csv","CH235 tips with measured IC50",41
+"full_ensemble","/Users/hushu/Dropbox (个人)/Hu Shu/flu_deeplearning/HIV/github_upload/figures/source_data/full_predictions.csv","CH235 tips without measured IC50",253
