@@ -75,13 +75,13 @@ EPITOPE_CLASS_TO_REGION = {
     "V1V2": "V1V2",
     "MPER": "MPER",
     "fusion_peptide": "fusion_peptide",
-    "CD4i": "CD4bs",
+    "CD4i": "CD4i",
     "interface": "CD4bs",
     "glycan_other": "V3",
     "multi": "CD4bs",
     "silent_face": "V3",
-    "other": "CD4bs",
-    "unknown": "CD4bs",
+    "other": "NA",
+    "unknown": "NA",
 }
 _DEFAULT_MODEL_WEIGHT_ROOT = (
     ROOT.parents[1] / "DNAFM" / "model_weight"

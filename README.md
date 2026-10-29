@@ -29,7 +29,7 @@ figures.
 
 ## Demo And Model Artifacts
 
-- Interactive demo: <https://huggingface.co/spaces/<your-hf-username>/UniCAV>
+- Interactive demo: <https://huggingface.co/spaces/YDXX/UniCAV>
 - Runtime artifacts are expected from the Hugging Face model repository
   `<your-hf-username>/UniCAV-artifacts`.
 - The demo loads artifacts through:
@@ -80,7 +80,7 @@ written under the corresponding `figures/Figure*_panels/` or
 ## Data Availability
 
 - Neutralization measurements were derived from CATNAP:
-  <https://www.hiv.lanl.gov/components/sequence/HIV/neutralization/>
+  [https://www.hiv.lanl.gov/components/sequence/HIV/neutralization/](https://www.hiv.lanl.gov/components/sequence/HIV/neutralization/)
 - Figure-level source data are provided in `figures/source_data/`.
 - Supplementary tables are provided in `tables/`.
 - Large model weights and embedding caches are not stored in this GitHub

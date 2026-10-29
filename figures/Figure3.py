@@ -7,7 +7,7 @@ One runnable script for all Figure 3 panels (A-E), reading bundled data from
   A panel_attention_hxb2      global Env cross-attention vs HXB2 position
   B panel_attention_validation per-epitope contact-ranking AUROC
   C panel_shap_modules        SHAP module share (mean |SHAP| %)
-  D panel_latent_antibody     fold-1 pair-embedding t-SNE by antibody lineage
+  D panel_latent_outcome      fold-1 pair-embedding t-SNE by neutralization outcome
   E panel_latent_epitope      same t-SNE by antibody epitope class
 """
 from __future__ import annotations
@@ -222,38 +222,42 @@ def _load_latent():
     return d
 
 
-PAL30 = ["#3B6FB6", "#E8853A", "#4FA363", "#C0392B", "#8E6FB3", "#7A5C3E", "#D46BA8",
-         "#2BA0A8", "#B6B12C", "#1F4E79", "#E6AB02", "#1B9E77", "#E7298A", "#66A61E",
-         "#A6761D", "#5E3C99", "#D7301F", "#3690C0", "#80CDC1", "#8FB0DB", "#C51B7D",
-         "#35978F", "#BF812D", "#762A83", "#01665E", "#DE77AE", "#4D9221", "#8C510A",
-         "#542788", "#F46D43"]
+COL_SENSITIVE = "#2C7FB8"
+COL_RESISTANT = "#D6604D"
 
 
-def panel_latent_antibody():
-    d = _load_latent().dropna(subset=["tsne_x", "tsne_y", "ab_lineage"])
-    d["tsne_x"] = d["tsne_x"].astype(float); d["tsne_y"] = d["tsne_y"].astype(float)
-    N_TOP = 30; n_lin = d["ab_lineage"].nunique()
-    top = d["ab_lineage"].value_counts().head(N_TOP).index.tolist()
-    col_of = {lin: PAL30[i] for i, lin in enumerate(top)}
-    fig, ax = plt.subplots(figsize=(124 * MM, 92 * MM))
-    rest = d[~d["ab_lineage"].isin(top)]
-    ax.scatter(rest["tsne_x"], rest["tsne_y"], s=2.0, c="#D8D8D8", linewidths=0, alpha=0.5)
-    for lin in top:
-        s = d[d["ab_lineage"] == lin]
-        ax.scatter(s["tsne_x"], s["tsne_y"], s=2.6, color=col_of[lin], linewidths=0, alpha=0.9)
+def panel_latent_outcome():
+    d = _load_latent().dropna(subset=["tsne_x", "tsne_y", "y_true"]).copy()
+    for col in ("tsne_x", "tsne_y", "y_true"):
+        d[col] = pd.to_numeric(d[col], errors="coerce")
+    d = d.dropna(subset=["tsne_x", "tsne_y", "y_true"])
+    d = d[d["y_true"].isin([0, 1])].copy()
+    d["y_true"] = d["y_true"].astype(int)
+
+    # Shuffle the draw order so neither outcome class systematically overlays the other.
+    d = d.sample(frac=1.0, random_state=0).reset_index(drop=True)
+    colors = np.where(d["y_true"].to_numpy() == 1, COL_SENSITIVE, COL_RESISTANT)
+    n_sensitive = int((d["y_true"] == 1).sum())
+    n_resistant = int((d["y_true"] == 0).sum())
+
+    fig, ax = plt.subplots(figsize=(78 * MM, 78 * MM))
+    ax.scatter(d["tsne_x"], d["tsne_y"], s=2.2, c=colors, linewidths=0, alpha=0.85)
     ax.set_xlabel("t-SNE 1"); ax.set_ylabel("t-SNE 2"); ax.tick_params(length=2.5, width=0.35)
     for sp in ("left", "bottom"):
         ax.spines[sp].set_color("#C8CDD3")
-    ax.set_title("Pair embedding by antibody lineage", fontsize=8, pad=8)
-    handles = [Line2D([0], [0], marker="o", color="none", markerfacecolor=col_of[l], markeredgecolor="none", markersize=4.0, label=l) for l in top]
-    handles.append(Line2D([0], [0], marker="o", color="none", markerfacecolor="#D8D8D8", markeredgecolor="none", markersize=4.0, label=f"other ({n_lin - N_TOP})"))
-    leg = ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.01, 1.0), ncol=1, fontsize=5.0,
-                    handletextpad=0.3, labelspacing=0.30, borderaxespad=0.0,
-                    title=f"Antibody lineage (top {N_TOP} of {n_lin})", title_fontsize=6.0)
-    leg._legend_box.align = "left"
-    ax.text(0.015, 0.015, "Linear probe (lineage): 0.995", transform=ax.transAxes, fontsize=6, color="#444", va="bottom", ha="left",
-            bbox=dict(boxstyle="round,pad=0.25", fc="white", ec="none", alpha=0.75))
-    fig.tight_layout(); _save(fig, "panel_D_latent_antibody")
+    ax.set_title("Pair embedding by neutralization outcome", fontsize=8, pad=8)
+    handles = [
+        Line2D([0], [0], marker="o", color="none", markerfacecolor=COL_SENSITIVE,
+               markeredgecolor="none", markersize=4.5,
+               label=f"Sensitive  n={n_sensitive:,}"),
+        Line2D([0], [0], marker="o", color="none", markerfacecolor=COL_RESISTANT,
+               markeredgecolor="none", markersize=4.5,
+               label=f"Resistant  n={n_resistant:,}"),
+    ]
+    ax.legend(handles=handles, loc="upper right", bbox_to_anchor=(0.99, 0.99),
+              ncol=1, fontsize=6.0, handletextpad=0.3, labelspacing=0.35,
+              frameon=True, facecolor="white", edgecolor="none", framealpha=0.75)
+    fig.tight_layout(); _save(fig, "panel_D_latent_outcome")
 
 
 EPI_ORDER = ["CD4bs", "V3", "V1V2", "interface", "fusion_peptide", "MPER", "CD4i", "silent_face", "glycan_other", "multi", "other", "unknown"]
@@ -285,7 +289,7 @@ def panel_latent_epitope():
 
 def main():
     for fn in (panel_attention_hxb2, panel_attention_validation, panel_shap_modules,
-               panel_latent_antibody, panel_latent_epitope):
+               panel_latent_outcome, panel_latent_epitope):
         try:
             fn()
         except Exception as e:
